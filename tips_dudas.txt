@@ -1,0 +1,31 @@
+-Los puntos de vida y energía de los combatientes deben depender del tipo de combatiente para que sea determinista.
+-El CreadorCombatientes tiene un contador interno para asignarle el id a cada combatiente, pues se da por orden de creación. Por ello es algo imposible crear dos combatientes iguales, ya que estos se diferencian por ID. Pueden tener el mismo nombre sin problemas.
+-Los tipos de combatientes no están definidos por las escuelas donde son preparados, sino al momento de ser creados. Es decir, una escuela no prepara tipos específicos de combatientes, puede preparar a cualquiera.
+-Recordar optar por BONUS REACTIVO.
+-Para registrar la cantidad de usos de cada técnica por cada combatiente, por la regla del compañero, podría tener un MAP(Técnica, CantUsos). Recordar que son 5 usos en todo el torneo por técnica.
+
+*Escuela de la Espada:
+-Técnicas: Corte de los Mil Amaneceres (ofensiva).
+-Equipamiento: Espada Celestial, Armadura Infernal, Espada Demoniaca.
+
+*Palacio del Vacío:
+-Técnicas: Dominio de la Nada (ofensiva), Meditación del Inmortal (recuperacion)
+-Equipamiento: Anillo Espiritual.
+
+*Monasterio del Cuerpo Dorado:
+-Técnicas: Muro del Cuerpo Dorado (defensiva), Rugido de la Bestia Primordial (ofensiva).
+-Equipamiento: Armadura Dorada, Sello del Fénix.
+
+
+-Si la escuela tiene los 4 tipos de equipamiento, pero solo pueden equiparse 3, una solución sería que cada clase de combatiente tenga una lista con los tipos de equipamiento y los ordene por prioridad.
+En base a esta lista de niveles de prioridad, cuando el combatiente deba equiparse, deberá hacer una búsqueda en la lista de equipamientos de la escuela por cada nivel de prioridad hasta llenar su equipamiento de 3 piezas o que no tenga más la escuela.
+**PROBLEMA** Si la escuela tiene 50 equipamientos de un mismo tipo, cuando busque los otros tipos de equipamientos recorren toda la lista al pedo. Termina siendo ineficiente.
+Ante ello, lo mejor sería que tome los 3 primeros equipamientos sea cual fuere y listo. Solo quedaría el problema de si son dos de la misma categoría.
+-Para no tener dos equipamientos de una misma categoría puede implementarse un Map<TipoEquipamiento, boolean> en el combatiente, entonces lo cargo con las categorías que haya y las pongo todas en false. Cuando vaya equipando lo pongo en true, y si ya está equipada esa categoría, pasará de largo sin equiparla.
+-Que se pueda equipar y quitar el equipamiento antes del torneo y entre combates no termino de entender. Por ejemplo, en caso de que la escuela tenga más de 3 equipamientos disponibles sería normal pensar que puedo aprovechar para ir cambiando entre estos en cada combate, pero eso sería una decisión o elección del usuario. No me imagino un cambio por parte del propio sistema de forma determinista (sino otra sería que sea random, pero dejaría de ser determinista el combate). Si pudiera elegir el usuario al ver el combate, sí, podría seguir siendo determinista, pero involucra que el Heraldo muestre el mensaje por pantalla, y no se especifica que pueda recibir información de afuera.
+
+
+
+
+
+
