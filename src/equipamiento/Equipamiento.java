@@ -1,6 +1,6 @@
 package equipamiento;
 
-public class Equipamiento {
+public abstract class Equipamiento {
 	private final String nombre;
     private final CategoriaEquipamiento categoria;
 
