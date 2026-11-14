@@ -3,23 +3,31 @@ package combatiente;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import equipamiento.CategoriaEquipamiento;
 import equipamiento.Equipamiento;
+import tecnicas.Tecnica;
 
 public abstract class Combatiente {
     private static final int MAX_EQUIPAMIENTOS = 3;
     protected static final int VIDA_BASE = 100;
     protected static final int ENERGIA_BASE = 40;
+    private static final int MAX_USOS_TECNICA = 5;
+    
 
     private final int id;
     private final String nombre;
     private int vidaActual;
     private int energiaActual;
+    private int reduccionDefensivaActiva = 0;
 
     // Usamos EnumMap para garantizar que no haya dos de la misma categoría
     private final Map<CategoriaEquipamiento, Equipamiento> equipamientos;
+    
+    // Usamos un LinkedHashMap porque permite asociar cada técnica con su cantidad de usos y conserva el orden en que se agregaron.
+    private final Map<Tecnica, Integer> usosTecnicas = new LinkedHashMap<>();
 
     protected Combatiente(int id, String nombre) {
         this.id = id;
@@ -34,18 +42,18 @@ public abstract class Combatiente {
     protected int aplicarReduccionDanioTipo(int danio) { return danio; }
     protected int aplicarReduccionCostoEnergiaTipo(int costo) { return costo; }
 
-    // Revisar calculo daño
-    //public int calcularDanioSaliente(int danioBase) {
-   //     int danioConTipo = aplicarBonificacionDanioTipo(danioBase);
-   //     int bonoEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoDanio).sum();
-  //      return Math.max(0, danioConTipo + bonoEquipo);
-  //  }
+
+    public int calcularDanioSaliente(int danioBase) {
+        int danioConTipo = aplicarBonificacionDanioTipo(danioBase);
+        int bonoEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoDanio).sum();
+        return Math.max(0, danioConTipo + bonoEquipo);
+    }
 
     public void recibirDanio(int danioBruto) {
         int danioTrasTipo = aplicarReduccionDanioTipo(danioBruto);
         int reduccionEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoReduccionDanio).sum();
         // Acá también restamos reducción por técnicas defensivas activas en el combate
-        int danioFinal = Math.max(0, danioTrasTipo - reduccionEquipo);
+        int danioFinal = Math.max(0, danioTrasTipo - reduccionEquipo - reduccionDefensivaActiva);//Se agrega redDefensiva al calculo.
         this.vidaActual = Math.max(0, this.vidaActual - danioFinal);
     }
 
@@ -75,6 +83,89 @@ public abstract class Combatiente {
             this.vidaActual = Math.min(this.vidaActual, getVidaMaxima());
             this.energiaActual = Math.min(this.energiaActual, getEnergiaMaxima());
         }
+    }
+    
+    //Aumento de defensa durante x cantidad de turnos.
+    public void agregarDefensaTemporal(int reduccion) {
+        if (reduccion < 0) {
+            throw new IllegalArgumentException("Reducción inválida");
+        }
+        reduccionDefensivaActiva += reduccion;
+    }
+    
+    //Aplica en tecnicas de drenaje
+    public void perderEnergia(int cantidad) {
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("Cantidad inválida");
+        }
+        this.energiaActual = Math.max(0, energiaActual - cantidad);
+    }
+    
+    //Aplica en tecnicas de curacion
+    public void recuperarVida(int cantidad) {
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("Cantidad inválida");
+        }
+
+        this.vidaActual = Math.min(
+            getVidaMaxima(),
+            vidaActual + cantidad
+        );
+    }
+    
+    public void aprenderTecnica(Tecnica tecnica) {
+        if (tecnica == null) {
+            throw new IllegalArgumentException("Técnica nula");
+        }
+
+        usosTecnicas.putIfAbsent(tecnica, 0);//Si la tecnica no existe, la inicializa en 0.
+    }
+    
+    public int getUsosRestantes(Tecnica tecnica) {
+        Integer usados = usosTecnicas.get(tecnica);
+
+        if (usados == null) {
+            throw new IllegalArgumentException("Técnica no aprendida");
+        }
+
+        return MAX_USOS_TECNICA - usados;
+    }
+    
+
+public void ejecutarTecnica(Tecnica tecnica, Combatiente objetivo) {
+
+    if (!estaEnPie()) {
+        throw new IllegalStateException("Combatiente fuera de combate");
+    }
+
+    if (objetivo == null) {
+        throw new IllegalArgumentException("Objetivo nulo");
+    }
+
+    if (!usosTecnicas.containsKey(tecnica)) {
+        throw new IllegalArgumentException("Técnica no aprendida");
+    }
+
+    if (getUsosRestantes(tecnica) <= 0) {
+        throw new IllegalStateException("Sin usos disponibles");
+    }
+
+    int costo = calcularCostoEnergia(tecnica.getCostoEnergia());
+
+    if (energiaActual < costo) {
+        throw new IllegalStateException("Energía insuficiente");
+    }
+
+    energiaActual -= costo;
+
+    tecnica.ejecutar(this, objetivo);
+
+    usosTecnicas.put(tecnica, usosTecnicas.get(tecnica) + 1);
+}
+
+
+    public boolean tieneDefensaActiva() {
+        return reduccionDefensivaActiva > 0;
     }
 
     public Collection<Equipamiento> getEquipamientos() {
