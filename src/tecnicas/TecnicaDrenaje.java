@@ -21,6 +21,10 @@ public class TecnicaDrenaje extends Tecnica {
         objetivo.recibirDanio(danio);
         objetivo.perderEnergia(energiaDrenada);
     }
+    @Override
+    public TipoTecnica getTipo() {
+        return TipoTecnica.OFENSIVA; // daña al rival, se elige como ofensiva
+    }
 }
 
 //Provocan danio y quitan energia.

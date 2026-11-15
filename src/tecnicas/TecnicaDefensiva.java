@@ -14,6 +14,10 @@ public class TecnicaDefensiva extends Tecnica {
     @Override
     public void ejecutar(Combatiente ejecutor, Combatiente objetivo) {
         ejecutor.agregarDefensaTemporal(reduccion);
+   }
+    @Override
+    public TipoTecnica getTipo() {
+        return TipoTecnica.DEFENSIVA;
     }
 }
 
