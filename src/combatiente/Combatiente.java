@@ -15,6 +15,7 @@ public abstract class Combatiente {
     protected static final int VIDA_BASE = 100;
     protected static final int ENERGIA_BASE = 40;
     private static final int MAX_USOS_TECNICA = 5;
+    private static final int DAÑIO_ATAQUE_BASICO = 10;
     
 
     private final int id;
@@ -36,7 +37,27 @@ public abstract class Combatiente {
         this.vidaActual = VIDA_BASE;
         this.energiaActual = ENERGIA_BASE;
     }
-
+    //Se llama al inicio de cada combate para setearlo
+    public void prepararParaCombate() {
+        this.vidaActual = getVidaMaxima();
+        this.energiaActual = getEnergiaMaxima();
+        this.reduccionDefensivaActiva = 0;
+    }
+    public void recuperarEnergiaAsalto(int cantidadFija) {
+        if (estaEnPie() && cantidadFija > 0) {
+            this.energiaActual = Math.min(getEnergiaMaxima(), this.energiaActual + cantidadFija);
+        }
+    }
+    public void realizarAtaqueBasico(Combatiente objetivo) {
+        if (!estaEnPie()) {
+            throw new IllegalStateException("Combatiente fuera de combate");
+        }
+        if (objetivo == null || !objetivo.estaEnPie()) {
+            throw new IllegalArgumentException("Objetivo inválido");
+        }
+        int danio = calcularDanioSaliente(DAÑIO_ATAQUE_BASICO);
+        objetivo.recibirDanio(danio);
+    }
 
     protected int aplicarBonificacionDanioTipo(int danio) { return danio; }
     protected int aplicarReduccionDanioTipo(int danio) { return danio; }
@@ -47,6 +68,15 @@ public abstract class Combatiente {
         int danioConTipo = aplicarBonificacionDanioTipo(danioBase);
         int bonoEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoDanio).sum();
         return Math.max(0, danioConTipo + bonoEquipo);
+    }
+    public boolean puedeUsarTecnica(Tecnica tecnica) {
+        if (!usosTecnicas.containsKey(tecnica)) return false;
+        if (getUsosRestantes(tecnica) <= 0) return false;
+        int costoReal = calcularCostoEnergia(tecnica.getCostoEnergia());
+        return this.energiaActual >= costoReal;
+    }
+    public boolean leFaltaVida() {
+        return this.vidaActual < getVidaMaxima();
     }
 
     public void recibirDanio(int danioBruto) {
@@ -129,6 +159,40 @@ public abstract class Combatiente {
         }
 
         return MAX_USOS_TECNICA - usados;
+    }
+    public Tecnica elegirTecnicaParaTurno(java.util.function.Predicate<Tecnica> permitidaPorCompaniero) {
+        // 1. Técnica de recuperación si le falta vida
+        if (leFaltaVida()) {
+            for (Tecnica t : usosTecnicas.keySet()) {
+                if (t.esDeRecuperacion() && puedeUsarTecnica(t) && permitidaPorCompaniero.test(t)) {
+                    return t;
+                }
+            }
+        }
+     // 2. Técnica defensiva si no tiene una activa
+        if (!tieneDefensaActiva()) {
+            for (Tecnica t : usosTecnicas.keySet()) {
+                if (t.esDefensiva() && puedeUsarTecnica(t) && permitidaPorCompaniero.test(t)) {
+                    return t;
+                }
+            }
+        }
+
+        // 3. Técnica ofensiva con más usos restantes (LinkedHashMap respeta orden de escuela en empates)
+        Tecnica mejorOfensiva = null;
+        int maxUsosRestantes = -1;
+
+        for (Tecnica t : usosTecnicas.keySet()) {
+            if (t.esOfensiva() && puedeUsarTecnica(t) && permitidaPorCompaniero.test(t)) {
+                int restantes = getUsosRestantes(t);
+                if (restantes > maxUsosRestantes) {
+                    maxUsosRestantes = restantes;
+                    mejorOfensiva = t;
+                }
+            }
+        }
+
+        return mejorOfensiva;
     }
     
 
