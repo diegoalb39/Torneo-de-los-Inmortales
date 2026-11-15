@@ -22,7 +22,7 @@ public class Torneo {
 		if (parejas.size() < CANTIDAD_PAREJAS_MAX)
 			parejas.add(pareja);
 		else
-			System.out.println("MAXIMA CANTIDAD DE PAREJAS ALCANZADA");// pal heraldo movelo, Chapuzero
+			throw new IllegalStateException("MAXIMA CANTIDAD DE PAREJAS ALCANZADA");// pal heraldo movelo, Chapuzero
 	}
 
 	private Boolean validarPareja(Pareja pareja) {
@@ -33,6 +33,15 @@ public class Torneo {
 		}
 		return true;
 	}
+
+	public void iniciarTorneo() {
+		if (parejas.size() != CANTIDAD_PAREJAS_MAX) {
+			throw new IllegalStateException(
+					"El torneo requiere exactamente " + CANTIDAD_PAREJAS_MAX + " parejas. Hay " + parejas.size());
+		}
+		emparejarEnCombates();
+	}
+
 	//porque el set no tiene indices. los obtengo mas rapido en una lista
 	public void emparejarEnCombates() {
 		List<Pareja> lista = new ArrayList<>(parejas);
@@ -114,7 +123,23 @@ public class Torneo {
 		System.out.println("    " + actor.getNombre() + " usa " + tecnica.getNombre() + " sobre "
 				+ destino.getNombre() + " (vida: " + destino.getVidaActual() + ")");
 	}
+	// Rival en pie con menos vida actual; empate → menor id
+	private Combatiente elegirObjetivo(Pareja rival) {
+		Combatiente c1 = rival.getC1();
+		Combatiente c2 = rival.getC2();
 
+		if (!c1.estaEnPie() && !c2.estaEnPie())
+			return null;
+		if (!c1.estaEnPie())
+			return c2;
+		if (!c2.estaEnPie())
+			return c1;
+
+		if (c1.getVidaActual() != c2.getVidaActual()) {
+			return c1.getVidaActual() < c2.getVidaActual() ? c1 : c2;
+		}
+		return c1.getId() <= c2.getId() ? c1 : c2;
+	}
 	// Criterio por defecto: recuperación si le falta vida 
 	// >defensiva si no tiene una activa
 	// >ofensiva con más usos restantes. 
@@ -174,33 +199,9 @@ public class Torneo {
 		return primera; // primera es la de menor id
 	}
 
-	public void iniciarTorneo() {
-		if (parejas.size() != CANTIDAD_PAREJAS_MAX) {
-			throw new IllegalStateException(
-					"El torneo requiere exactamente " + CANTIDAD_PAREJAS_MAX + " parejas. Hay " + parejas.size());
-		}
-		emparejarEnCombates();
-	}
-
 	private boolean parejaEnPie(Pareja p) {
 		return p.getC1().estaEnPie() || p.getC2().estaEnPie();
 	}
 
-	// Rival en pie con menos vida actual; empate → menor id
-	private Combatiente elegirObjetivo(Pareja rival) {
-		Combatiente c1 = rival.getC1();
-		Combatiente c2 = rival.getC2();
 
-		if (!c1.estaEnPie() && !c2.estaEnPie())
-			return null;
-		if (!c1.estaEnPie())
-			return c2;
-		if (!c2.estaEnPie())
-			return c1;
-
-		if (c1.getVidaActual() != c2.getVidaActual()) {
-			return c1.getVidaActual() < c2.getVidaActual() ? c1 : c2;
-		}
-		return c1.getId() <= c2.getId() ? c1 : c2;
-	}
 }
