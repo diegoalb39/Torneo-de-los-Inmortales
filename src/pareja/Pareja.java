@@ -17,9 +17,15 @@ public class Pareja implements Comparable<Pareja> {
 	private final Map<Tecnica, Combatiente> usadaPor = new HashMap<>();
 
 	public Pareja(int id, Combatiente c1, Combatiente c2) {
-		this.id = id;
-		this.c1 = c1;
-		this.c2 = c2;
+	    if (c1 == null || c2 == null) {
+	        throw new IllegalArgumentException("Los combatientes no pueden ser nulos");
+	    }
+	    if (c1.equals(c2)) {
+	        throw new IllegalArgumentException("Un combatiente no puede formar pareja consigo mismo");
+	    }
+	    this.id = id;
+	    this.c1 = c1;
+	    this.c2 = c2;
 	}
 
 	public Combatiente getC1() {

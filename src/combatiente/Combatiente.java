@@ -261,8 +261,8 @@ public abstract class Combatiente {
 	}
 
 	public void restaurar() {
-		vidaActual = VIDA_BASE;
-		energiaActual = ENERGIA_BASE;
+		vidaActual = getVidaMaxima();
+	    energiaActual = getEnergiaMaxima();
 		reduccionDefensivaActiva = 0;
 	}
 }

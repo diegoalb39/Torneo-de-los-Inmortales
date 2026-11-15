@@ -1,16 +1,31 @@
 package presentadores;
 
+import java.util.List;
 import pareja.Pareja;
 
-public class HeraldoImperial {
-	
-	public void anunciarInicioTorneo() {
-        System.out.println("=== COMIENZA EL TORNEO IMPERIAL ===");
+public class HeraldoImperial implements InteresadoAcontecimiento {
+
+    @Override
+    public void recibirAcontecimiento(Acontecimiento acontecimiento) {
+        System.out.println(acontecimiento.getDetalle());
     }
-	   public void anunciarParejaInscripta(Pareja pareja) {
-	        System.out.println(
-	            "Pareja #" + pareja.getId() + " inscripta: "
-	            + pareja.getC1().getNombre() + " vs " + pareja.getC2().getNombre()
-	        );
-	    }
+
+    public void presentarTablaPosiciones(List<PosicionPareja> tabla) {
+        System.out.println("\n=== TABLA DE POSICIONES DEL TORNEO ===");
+        int puesto = 1;
+        for (PosicionPareja pos : tabla) {
+            Pareja p = pos.getPareja();
+            System.out.printf("%d° Puesto - Pareja #%d (%s y %s) | Última ronda: %d | Vida final: %d%n",
+                    puesto++,
+                    p.getId(),
+                    p.getC1().getNombre(),
+                    p.getC2().getNombre(),
+                    pos.getUltimaRondaJugada(),
+                    pos.getVidaTotalUltimoCombate());
+        }
+    }
+
+    public void anunciarMensaje(String mensaje) {
+        System.out.println(mensaje);
+    }
 }
