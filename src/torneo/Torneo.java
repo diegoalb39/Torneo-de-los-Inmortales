@@ -33,7 +33,7 @@ public class Torneo {
 		}
 		return true;
 	}
-
+	//porque el set no tiene indices. los obtengo mas rapido en una lista
 	public void emparejarEnCombates() {
 		List<Pareja> lista = new ArrayList<>(parejas);
 		for (int i = 0; i + 1 < lista.size(); i += 2) {
@@ -42,9 +42,10 @@ public class Torneo {
 	}
 
 	private void combatir(Pareja parejaA, Pareja parejaB) {
+		//por las dudas restauro la vida, energia al default
 		parejaA.restaurar();
 		parejaB.restaurar();
-
+		//elijo la pareja que juega primero
 		Pareja primera = parejaA.getId() <= parejaB.getId() ? parejaA : parejaB;
 		Pareja segunda = (primera == parejaA) ? parejaB : parejaA;
 
@@ -78,7 +79,7 @@ public class Torneo {
 
 	private void jugarTurno(Pareja atacante, Pareja defensor) {
 		System.out.println("  Turno de la Pareja " + atacante.getId() + ":");
-
+		//elijo al atacante
 		Combatiente a1 = atacante.getC1().getId() <= atacante.getC2().getId() ? atacante.getC1() : atacante.getC2();
 		Combatiente a2 = (a1 == atacante.getC1()) ? atacante.getC2() : atacante.getC1();
 
@@ -96,6 +97,7 @@ public class Torneo {
 			return;
 
 		Tecnica tecnica = elegirTecnica(actor, propia);
+		//ataque basico
 		if (tecnica == null) {
 			actor.atacar(objetivo);
 			System.out.println("    " + actor.getNombre() + " ataca a " + objetivo.getNombre()
@@ -113,11 +115,12 @@ public class Torneo {
 				+ destino.getNombre() + " (vida: " + destino.getVidaActual() + ")");
 	}
 
-	// Criterio por defecto: recuperación si le falta vida > defensiva si no tiene
-	// una activa > ofensiva con más usos restantes. En empate, la primera en el
-	// orden de aprendizaje. Devuelve null si ninguna es posible (→ ataque básico).
+	// Criterio por defecto: recuperación si le falta vida 
+	// >defensiva si no tiene una activa
+	// >ofensiva con más usos restantes. 
+	// En empate, la primera en el orden de aprendizaje. Devuelve null si ninguna es posible (→ ataque básico).
 	private Tecnica elegirTecnica(Combatiente actor, Pareja propia) {
-		if (actor.getVidaActual() < actor.getVidaMaxima()) {
+		if (actor.getVidaActual() <= actor.getVidaMaxima()*0.15) {//solo se cura cuando tenga poca vida
 			Tecnica t = primeraUsable(actor, propia, TipoTecnica.RECUPERACION);
 			if (t != null)
 				return t;
@@ -133,7 +136,7 @@ public class Torneo {
 		for (Tecnica t : actor.getTecnicas()) {
 			if (t.getTipo() != TipoTecnica.OFENSIVA || !esUsable(actor, propia, t))
 				continue;
-			// ">" estricto: en empate se queda la primera del orden
+			// ">" estricto: en empate se queda la que menos usaste
 			if (mejor == null || actor.getUsosRestantes(t) > actor.getUsosRestantes(mejor)) {
 				mejor = t;
 			}

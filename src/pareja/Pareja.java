@@ -36,7 +36,7 @@ public class Pareja implements Comparable<Pareja> {
 
 	// El compañero la bloquea mientras el que la usó siga en pie y le queden usos
 	public boolean puedeUsarTecnica(Combatiente c, Tecnica t) {
-		Combatiente duenio = usadaPor.get(t);
+		Combatiente duenio = usadaPor.get(t);//obtenes el que usa la tecnica y te fijas si la uso c, el compa
 		if (duenio == null || duenio.equals(c)) {
 			return true;
 		}
