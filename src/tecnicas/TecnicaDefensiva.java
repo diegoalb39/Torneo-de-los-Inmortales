@@ -8,6 +8,7 @@ public class TecnicaDefensiva extends Tecnica {
 
     public TecnicaDefensiva(String nombre, int costoEnergia, int reduccion) {
         super(nombre, costoEnergia);
+        if (reduccion < 0) throw new IllegalArgumentException("La reducción no puede ser negativa");
         this.reduccion = reduccion;
     }
 

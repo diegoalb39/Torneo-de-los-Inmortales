@@ -10,6 +10,9 @@ public class TecnicaDrenaje extends Tecnica {
     public TecnicaDrenaje(String nombre, int costoEnergia,
                          int danioBase, int energiaDrenada) {
         super(nombre, costoEnergia);
+        if (danioBase < 0 || energiaDrenada < 0) {
+            throw new IllegalArgumentException("El daño y el drenaje no pueden ser negativos");
+        }
         this.danioBase = danioBase;
         this.energiaDrenada = energiaDrenada;
     }

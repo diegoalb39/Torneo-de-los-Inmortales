@@ -12,6 +12,7 @@ public class TecnicaOfensiva extends Tecnica {
 
 	public TecnicaOfensiva(String nombre, int costoEnergia, int danioBase) {
 		super(nombre, costoEnergia);
+		if (danioBase < 0) throw new IllegalArgumentException("El daño no puede ser negativo");
 		this.danioBase = danioBase;
 	}
 

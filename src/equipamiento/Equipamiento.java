@@ -5,6 +5,9 @@ public abstract class Equipamiento {
     private final CategoriaEquipamiento categoria;
 
     public Equipamiento(String nombre, CategoriaEquipamiento categoria) {
+        if (nombre == null || nombre.isBlank() || categoria == null) {
+            throw new IllegalArgumentException("Nombre y categoría de equipamiento son obligatorios");
+        }
         this.nombre = nombre;
         this.categoria = categoria;
     }

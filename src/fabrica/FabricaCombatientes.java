@@ -12,7 +12,7 @@ public class FabricaCombatientes {
 	
 	//Agregar un cuarto tipo de combatiente requiere modificar la fábrica, posible alternativa implementarlo con un Map.
 
-    private int siguienteId = 1;
+    private static int siguienteId = 1;
 
     public Combatiente crearCombatiente(
             TipoCombatiente tipo,
@@ -21,6 +21,9 @@ public class FabricaCombatientes {
 
         Objects.requireNonNull(tipo);
         Objects.requireNonNull(escuela);
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre del combatiente es obligatorio");
+        }
 
         int id = siguienteId;
 
@@ -40,9 +43,7 @@ public class FabricaCombatientes {
                 break;
 
             default:
-                throw new IllegalArgumentException(
-                    "Tipo de combatiente desconocido"
-                );
+                throw new IllegalArgumentException("Tipo de combatiente desconocido");
         }
 
         escuela.prepararCombatiente(combatiente);

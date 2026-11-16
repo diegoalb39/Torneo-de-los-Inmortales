@@ -30,11 +30,15 @@ public class Escuela {
         }
     }
 
+    // Agrega una opción de equipamiento que la escuela puede ofrecer a sus alumnos.
     public void agregarEquipamiento(Equipamiento equipo) {
         Objects.requireNonNull(equipo);
-        equipamientos.add(equipo);
+        if (!equipamientos.contains(equipo)) {
+        	equipamientos.add(equipo);
+        }
     }
-
+    
+    // Enseña las técnicas y equipa hasta tres piezas, sin repetir categorías.
     public void prepararCombatiente(Combatiente combatiente) {
         Objects.requireNonNull(combatiente);
 
@@ -43,7 +47,14 @@ public class Escuela {
         }
 
         for (Equipamiento equipo : equipamientos) {
-            combatiente.equipar(equipo);
+            if (combatiente.getEquipamientos().size() >= 3) {
+                break;
+            }
+            boolean categoriaOcupada = combatiente.getEquipamientos().stream()
+                    .anyMatch(actual -> actual.getCategoria() == equipo.getCategoria());
+            if (!categoriaOcupada) {
+                combatiente.equipar(equipo);
+            }
         }
     }
 

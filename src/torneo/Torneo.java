@@ -24,6 +24,7 @@ public class Torneo {
     public static final int ENERGIA_RECUPERADA_POR_ASALTO = 5;
 
     private final int limiteAsaltos;
+    private boolean iniciado;
 
     public Torneo() {
         this(LIMITE_ASALTOS_POR_DEFECTO);
@@ -49,6 +50,9 @@ public class Torneo {
     }
 
     public void inscribir(Pareja pareja) {
+        if (iniciado) {
+            throw new IllegalStateException("No se puede inscribir parejas una vez iniciado el torneo");
+        }
         if (pareja == null) {
             throw new IllegalArgumentException("La pareja no puede ser nula");
         }
@@ -71,12 +75,16 @@ public class Torneo {
     }
 
     public Pareja iniciarTorneo() {
+        if (iniciado) {
+            throw new IllegalStateException("El torneo ya fue iniciado");
+        }
         int inscriptas = parejas.size();
         if (inscriptas != CANTIDAD_PAREJAS_MIN && inscriptas != CANTIDAD_PAREJAS_MAX) {
             throw new IllegalStateException(
                     "El torneo se debe jugar únicamente con 4 u 8 parejas. Inscriptas: " + inscriptas);
         }
 
+        iniciado = true;
         List<Pareja> enCompetencia = new ArrayList<>(parejas);
         int numeroRonda = 1;
 
@@ -176,6 +184,7 @@ public class Torneo {
 
             if (estabaEnPie && !objetivo.estaEnPie()) {
                 notificar(Acontecimiento.eliminacion(ronda, objetivo.getNombre(), actor.getNombre()));
+                notificarReaccionCompanero(ronda, rival, objetivo);
             }
             return;
         }
@@ -192,6 +201,15 @@ public class Torneo {
 
         if (estabaEnPie && !destino.estaEnPie()) {
             notificar(Acontecimiento.eliminacion(ronda, destino.getNombre(), actor.getNombre()));
+            notificarReaccionCompanero(ronda, rival, destino);
+        }
+    }
+    
+    // Informa al compañero sobreviviente y registra si activó una reacción.
+    private void notificarReaccionCompanero(int ronda, Pareja parejaDefensora, Combatiente caido) {
+        Combatiente reactivo = parejaDefensora.notificarCaida(caido);
+        if (reactivo != null) {
+            notificar(Acontecimiento.reaccionActivada(ronda, reactivo.getNombre()));
         }
     }
 

@@ -32,6 +32,9 @@ public abstract class Combatiente {
 	private final Map<Tecnica, Integer> usosTecnicas = new LinkedHashMap<>();
 
 	protected Combatiente(int id, String nombre) {
+		if (id <= 0 || nombre == null || nombre.isBlank()) {
+			throw new IllegalArgumentException("El ID debe ser positivo y el nombre obligatorio");
+		}
 		this.id = id;
 		this.nombre = nombre;
 		this.equipamientos = new EnumMap<>(CategoriaEquipamiento.class);
@@ -64,12 +67,18 @@ public abstract class Combatiente {
 	}
 
 	public int calcularDanioSaliente(int danioBase) {
+		if (danioBase < 0) {
+			throw new IllegalArgumentException("El daño base no puede ser negativo");
+		}
 		int danioConTipo = aplicarBonificacionDanioTipo(danioBase);
 		int bonoEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoDanio).sum();
 		return Math.max(0, danioConTipo + bonoEquipo);
 	}
 
 	public void recibirDanio(int danioBruto) {
+		if (danioBruto < 0) {
+			throw new IllegalArgumentException("El daño recibido no puede ser negativo");
+		}
 		int danioTrasTipo = aplicarReduccionDanioTipo(danioBruto);
 		int reduccionEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoReduccionDanio).sum();
 		// Acá también restamos reducción por técnicas defensivas activas en el combate
@@ -80,6 +89,9 @@ public abstract class Combatiente {
 	}
 
 	public int calcularCostoEnergia(int costoBase) {
+		if (costoBase < 0) {
+			throw new IllegalArgumentException("El costo de energía no puede ser negativo");
+		}
 		return Math.max(0, aplicarReduccionCostoEnergiaTipo(costoBase));
 	}
 
@@ -128,7 +140,7 @@ public abstract class Combatiente {
 			throw new IllegalArgumentException("Cantidad inválida");
 		}
 
-		this.vidaActual = Math.min(getVidaMaxima(), vidaActual + cantidad);
+		this.vidaActual = (int) Math.min(getVidaMaxima(), (long) vidaActual + cantidad);
 	}
 
 	// Recuperación de energía al comenzar cada asalto
@@ -136,7 +148,7 @@ public abstract class Combatiente {
 		if (cantidad < 0) {
 			throw new IllegalArgumentException("Cantidad inválida");
 		}
-		this.energiaActual = Math.min(getEnergiaMaxima(), energiaActual + cantidad);
+		this.energiaActual = (int) Math.min(getEnergiaMaxima(), (long) energiaActual + cantidad);
 	}
 
 	public void aprenderTecnica(Tecnica tecnica) {
@@ -177,8 +189,11 @@ public abstract class Combatiente {
 			throw new IllegalStateException("Combatiente fuera de combate");
 		}
 
-		if (objetivo == null) {
-			throw new IllegalArgumentException("Objetivo nulo");
+		if (objetivo == null || !objetivo.estaEnPie()) {
+			throw new IllegalArgumentException("Objetivo nulo o fuera de combate");
+		}
+		if (tecnica == null) {
+			throw new IllegalArgumentException("Técnica nula");
 		}
 
 		if (!usosTecnicas.containsKey(tecnica)) {
@@ -260,9 +275,25 @@ public abstract class Combatiente {
 		return Objects.hash(id);
 	}
 
-	public void restaurar() {
-		vidaActual = getVidaMaxima();
-	    energiaActual = getEnergiaMaxima();
-		reduccionDefensivaActiva = 0;
-	}
+    // Notifica que cayó su compañero y devuelve si el combatiente activó una reacción.
+    public final boolean reaccionarAnteCaidaCompanero() {
+        return estaEnPie() && alCaerCompanero();
+    }
+
+    // Las subclases reactivas definen su respuesta ante la caída del compañero.
+    protected boolean alCaerCompanero() {
+        return false;
+    }
+
+    // Permite limpiar estados reactivos temporales al iniciar otro combate.
+    protected void reiniciarReaccion() {
+    }
+
+    // Recupera los valores máximos y elimina efectos temporales del combate anterior.
+    public void restaurar() {
+        vidaActual = getVidaMaxima();
+        energiaActual = getEnergiaMaxima();
+        reduccionDefensivaActiva = 0;
+        reiniciarReaccion();
+    }
 }

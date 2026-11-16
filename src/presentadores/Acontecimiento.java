@@ -40,6 +40,12 @@ public class Acontecimiento {
                 nombreEjecutor, nombreAccion, nombreObjetivo, vidaRestanteObjetivo);
         return new Acontecimiento(TipoAcontecimiento.ACCION_REALIZADA, ronda, msg, null, null, 0, 0);
     }
+    
+    // Describe la reacción que se activa cuando un combatiente pierde a su compañero.
+    public static Acontecimiento reaccionActivada(int ronda, String nombreCombatiente) {
+        String msg = String.format("  [!] %s activa su reacción por la caída de su compañero", nombreCombatiente);
+        return new Acontecimiento(TipoAcontecimiento.REACCION_ACTIVADA, ronda, msg, null, null, 0, 0);
+    }
 
     public static Acontecimiento eliminacion(int ronda, String nombreCaido, String nombreEjecutor) {
         String msg = String.format("  [!] %s ha quedado fuera de combate ante el ataque de %s",

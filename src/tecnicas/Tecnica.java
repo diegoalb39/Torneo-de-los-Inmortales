@@ -25,7 +25,5 @@ public abstract class Tecnica {
     public int getCostoEnergia() {
         return costoEnergia;
     }
-    public TipoTecnica getTipo() {
-		return null;
-	}
+    public abstract TipoTecnica getTipo();
 }

@@ -7,7 +7,7 @@ import combatiente.Combatiente;
 import tecnicas.Tecnica;
 
 public class Pareja implements Comparable<Pareja> {
-	private int id = 0;
+	private final int id;
 	// uso 2 campos y no una coleccion por ser 2 combatientes fijos y por
 	// simplicidad para buscarlos
 	private final Combatiente c1;
@@ -17,6 +17,9 @@ public class Pareja implements Comparable<Pareja> {
 	private final Map<Tecnica, Combatiente> usadaPor = new HashMap<>();
 
 	public Pareja(int id, Combatiente c1, Combatiente c2) {
+	    if (id <= 0) {
+	        throw new IllegalArgumentException("El ID de pareja debe ser positivo");
+	    }
 	    if (c1 == null || c2 == null) {
 	        throw new IllegalArgumentException("Los combatientes no pueden ser nulos");
 	    }
@@ -42,14 +45,32 @@ public class Pareja implements Comparable<Pareja> {
 
 	// El compañero la bloquea mientras el que la usó siga en pie y le queden usos
 	public boolean puedeUsarTecnica(Combatiente c, Tecnica t) {
+		if (c == null || t == null || !contieneA(c)) {
+			return false;
+		}
 		Combatiente duenio = usadaPor.get(t);//obtenes el que usa la tecnica y te fijas si la uso c, el compa
 		if (duenio == null || duenio.equals(c)) {
 			return true;
 		}
 		return !duenio.estaEnPie() || duenio.getUsosRestantes(t) <= 0;
 	}
+	
+    // Activa la reacción del integrante que sigue en pie cuando cae su compañero.
+    public Combatiente notificarCaida(Combatiente caido) {
+        if (!contieneA(caido)) {
+            throw new IllegalArgumentException("El combatiente no pertenece a esta pareja");
+        }
+        if (caido.estaEnPie()) {
+            throw new IllegalStateException("Solo se puede notificar la caída de un combatiente fuera de combate");
+        }
+        Combatiente companero = c1.equals(caido) ? c2 : c1;
+        return companero.reaccionarAnteCaidaCompanero() ? companero : null;
+    }
 
 	public void registrarUso(Combatiente c, Tecnica t) {
+        if (c == null || t == null || !contieneA(c) || !c.getTecnicas().contains(t)) {
+            throw new IllegalArgumentException("El combatiente debe pertenecer a la pareja y conocer la técnica");
+        }
 		usadaPor.put(t, c);
 	}
 

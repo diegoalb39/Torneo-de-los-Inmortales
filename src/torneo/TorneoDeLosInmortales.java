@@ -2,6 +2,11 @@ package torneo;
 
 import combatiente.Combatiente;
 import escuela.Escuela;
+import equipamiento.AnilloEspiritual;
+import equipamiento.ArmaduraDorada;
+import equipamiento.ArmaduraInfernal;
+import equipamiento.EspadaCelestial;
+import equipamiento.SelloDelFenix;
 import fabrica.FabricaCombatientes;
 import fabrica.TipoCombatiente;
 import pareja.Pareja;
@@ -17,22 +22,31 @@ public class TorneoDeLosInmortales {
     public static void main(String[] args) {
         FabricaCombatientes fabrica = new FabricaCombatientes();
 
-        Escuela escuela = new Escuela("Palacio del Vacío");
-        escuela.agregarTecnica(new TecnicaOfensiva("Corte de los Mil Amaneceres", 10, 25));
-        escuela.agregarTecnica(new TecnicaOfensiva("Rugido de la Bestia Primordial", 25, 60));
-        escuela.agregarTecnica(new TecnicaDrenaje("Dominio de la Nada", 15, 20, 10));
-        escuela.agregarTecnica(new TecnicaDefensiva("Muro del Cuerpo Dorado", 10, 5));
-        escuela.agregarTecnica(new TecnicaRecuperacion("Meditación del Inmortal", 15, 30));
+        Escuela espada = new Escuela("Escuela de la Espada Celestial");
+        espada.agregarTecnica(new TecnicaOfensiva("Corte de los Mil Amaneceres", 10, 25));
+        espada.agregarEquipamiento(new EspadaCelestial());
+        espada.agregarEquipamiento(new ArmaduraInfernal());
 
-        Combatiente aurelio = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Aurelio", escuela);
-        Combatiente nebula = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Nébula", escuela);
-        Combatiente kael = fabrica.crearCombatiente(TipoCombatiente.MONJE_CELESTIAL, "Kael", escuela);
-        Combatiente darian = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Darian", escuela);
+        Escuela vacio = new Escuela("Palacio del Vacío");
+        vacio.agregarTecnica(new TecnicaDrenaje("Dominio de la Nada", 15, 20, 10));
+        vacio.agregarTecnica(new TecnicaRecuperacion("Meditación del Inmortal", 15, 30));
+        vacio.agregarEquipamiento(new AnilloEspiritual());
 
-        Combatiente seraph = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Seraph", escuela);
-        Combatiente lyra = fabrica.crearCombatiente(TipoCombatiente.MONJE_CELESTIAL, "Lyra", escuela);
-        Combatiente orion = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Orión", escuela);
-        Combatiente vega = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Vega", escuela);
+        Escuela cuerpo = new Escuela("Monasterio del Cuerpo Dorado");
+        cuerpo.agregarTecnica(new TecnicaDefensiva("Muro del Cuerpo Dorado", 10, 5));
+        cuerpo.agregarTecnica(new TecnicaOfensiva("Rugido de la Bestia Primordial", 25, 60));
+        cuerpo.agregarEquipamiento(new ArmaduraDorada());
+        cuerpo.agregarEquipamiento(new SelloDelFenix());
+
+        Combatiente aurelio = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Aurelio", espada);
+        Combatiente nebula = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Nébula", vacio);
+        Combatiente kael = fabrica.crearCombatiente(TipoCombatiente.MONJE_CELESTIAL, "Kael", cuerpo);
+        Combatiente darian = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Darian", espada);
+
+        Combatiente seraph = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Seraph", vacio);
+        Combatiente lyra = fabrica.crearCombatiente(TipoCombatiente.MONJE_CELESTIAL, "Lyra", cuerpo);
+        Combatiente orion = fabrica.crearCombatiente(TipoCombatiente.CULTIVADOR_ESPADA, "Orión", espada);
+        Combatiente vega = fabrica.crearCombatiente(TipoCombatiente.HECHICERO_VACIO, "Vega", vacio);
 
         Pareja p1 = new Pareja(1, aurelio, nebula);
         Pareja p2 = new Pareja(2, kael, darian);
@@ -43,7 +57,7 @@ public class TorneoDeLosInmortales {
         HeraldoImperial heraldo = new HeraldoImperial();
         CronistaDeLaSecta cronista = new CronistaDeLaSecta();
 
-        // Registramos al Heraldo y al Cronista como observadores
+        // Ambos observadores reciben acciones, eliminaciones y activaciones reactivas.
         torneo.registrarInteresado(heraldo);
         torneo.registrarInteresado(cronista);
 
@@ -52,10 +66,7 @@ public class TorneoDeLosInmortales {
         torneo.inscribir(p3);
         torneo.inscribir(p4);
 
-        // Ejecutamos el torneo completo (Semifinales + Final + Proclamación)
         torneo.iniciarTorneo();
-
-        // Al terminar el torneo, el main le pide la tabla al Cronista y el Heraldo la presenta
         heraldo.presentarTablaPosiciones(cronista.obtenerTablaPosiciones());
     }
 }
