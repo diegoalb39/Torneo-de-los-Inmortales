@@ -9,7 +9,7 @@ import escuela.Escuela;
 import fabrica.FabricaCombatientes;
 import fabrica.TipoCombatiente;
 
-class FabricaCombatientesTest {
+class FabricaCombatienteTest {
 
     @Test
     void distintasFabricasNoGeneranIdentificadoresRepetidos() {

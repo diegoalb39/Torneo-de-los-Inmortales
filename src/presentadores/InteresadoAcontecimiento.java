@@ -1,5 +1,5 @@
 package presentadores;
 
 public interface InteresadoAcontecimiento {
-    void recibirAcontecimiento(Acontecimiento acontecimiento);
+	void recibirAcontecimiento(Acontecimiento acontecimiento);
 }

@@ -3,72 +3,79 @@ package escuela;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-
 import combatiente.Combatiente;
 import equipamiento.Equipamiento;
 import tecnicas.Tecnica;
 
 public class Escuela {
 
-    private final String nombre;
-    private final List<Tecnica> tecnicas;
-    private final List<Equipamiento> equipamientos;
-    
-    //Las técnicas deben conservar el orden de la escuela para resolver empates durante el combate, por eso usamos una lista.
+	private final String nombre;
+	private final List<Tecnica> tecnicas;
+	private final List<Equipamiento> equipamientos;
 
-    public Escuela(String nombre) {
-        this.nombre = Objects.requireNonNull(nombre); //Si nombre tiene un valor asignado, lo asigna. Si no devuelve un NullPointerException.
-        this.tecnicas = new ArrayList<>();
-        this.equipamientos = new ArrayList<>();
-    }
+	// Las técnicas deben conservar el orden de la escuela para resolver empates
+	// durante el combate, por eso usamos una lista.
 
-    public void agregarTecnica(Tecnica tecnica) {
-        Objects.requireNonNull(tecnica);
-        if (!tecnicas.contains(tecnica)) {
-            tecnicas.add(tecnica);
-        }
-    }
+	public Escuela(String nombre) {
+		if (null == nombre) {
+			throw new IllegalArgumentException("El nombre de la escuela no puede ser nulo.\n");
+		}
+		this.nombre = nombre;
+		this.tecnicas = new ArrayList<>();
+		this.equipamientos = new ArrayList<>();
+	}
 
-    // Agrega una opción de equipamiento que la escuela puede ofrecer a sus alumnos.
-    public void agregarEquipamiento(Equipamiento equipo) {
-        Objects.requireNonNull(equipo);
-        if (!equipamientos.contains(equipo)) {
-        	equipamientos.add(equipo);
-        }
-    }
-    
-    // Enseña las técnicas y equipa hasta tres piezas, sin repetir categorías.
-    public void prepararCombatiente(Combatiente combatiente) {
-        Objects.requireNonNull(combatiente);
+	public void agregarTecnica(Tecnica tecnica) {
+		if (null == tecnica) {
+			throw new IllegalArgumentException("No se admiten técnicas nulas.\n");
+		}
+		if (!tecnicas.contains(tecnica)) {
+			tecnicas.add(tecnica);
+		}
+	}
 
-        for (Tecnica tecnica : tecnicas) {
-            combatiente.aprenderTecnica(tecnica);
-        }
+	// Agrega una opción de equipamiento que la escuela puede ofrecer a sus alumnos.
+	public void agregarEquipamiento(Equipamiento equipo) {
+		if (null == equipo) {
+			throw new IllegalArgumentException("No se admite equipo nulo.\n");
+		}
+		if (!equipamientos.contains(equipo)) {
+			equipamientos.add(equipo);
+		}
+	}
 
-        for (Equipamiento equipo : equipamientos) {
-            if (combatiente.getEquipamientos().size() >= 3) {
-                break;
-            }
-            boolean categoriaOcupada = combatiente.getEquipamientos().stream()
-                    .anyMatch(actual -> actual.getCategoria() == equipo.getCategoria());
-            if (!categoriaOcupada) {
-                combatiente.equipar(equipo);
-            }
-        }
-    }
+	// Enseña las técnicas y equipa hasta tres piezas, sin repetir categorías.
+	public void prepararCombatiente(Combatiente combatiente) {
+		if (null == combatiente) {
+			throw new IllegalArgumentException("El combatiente no puede ser nulo.\n");
+		}
 
-    public String getNombre() {
-        return nombre;
-    }
+		for (Tecnica tecnica : tecnicas) {
+			combatiente.aprenderTecnica(tecnica);
+		}
 
-    public List<Tecnica> getTecnicas() {
-        return Collections.unmodifiableList(tecnicas);
-    }
+		for (Equipamiento equipo : equipamientos) {
+			if (combatiente.getEquipamientos().size() >= 3) {
+				break;
+			}
+			boolean categoriaOcupada = combatiente.tieneCategoriaOcupada(equipo.getCategoria());
+			if (!categoriaOcupada) {
+				combatiente.equipar(equipo);
+			}
+		}
+	}
 
-    public List<Equipamiento> getEquipamientos() {
-        return Collections.unmodifiableList(equipamientos);
-    }
+	public String getNombre() {
+		return nombre;
+	}
+
+	public List<Tecnica> getTecnicas() {
+		return Collections.unmodifiableList(tecnicas);
+	}
+
+	public List<Equipamiento> getEquipamientos() {
+		return Collections.unmodifiableList(equipamientos);
+	}
 }
 
 //Ejemplo implementacion:

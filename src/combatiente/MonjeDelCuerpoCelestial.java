@@ -7,7 +7,7 @@ public class MonjeDelCuerpoCelestial extends Combatiente {
     
     private int escudoPendiente = 0;
 
-    public MonjeDelCuerpoCelestial(int id, String nombre) {
+	public MonjeDelCuerpoCelestial(int id, String nombre) {
         super(id, nombre);
     }
 

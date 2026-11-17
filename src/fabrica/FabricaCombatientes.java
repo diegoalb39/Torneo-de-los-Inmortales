@@ -6,57 +6,47 @@ import combatiente.MonjeDelCuerpoCelestial;
 import combatiente.HechiceroDelVacio;
 import escuela.Escuela;
 
-import java.util.Objects;
-
 public class FabricaCombatientes {
-	
-	//Agregar un cuarto tipo de combatiente requiere modificar la fábrica, posible alternativa implementarlo con un Map.
 
-    private static int siguienteId = 1;
+	private static int siguienteId = 1;
 
-    public Combatiente crearCombatiente(
-            TipoCombatiente tipo,
-            String nombre,
-            Escuela escuela) {
+	public Combatiente crearCombatiente(TipoCombatiente tipo, String nombre, Escuela escuela) {
+		if (null == tipo) {
+			throw new IllegalArgumentException("El tipo de combatiente no puede ser nulo.\n");
+		}
+		if (null == escuela) {
+			throw new IllegalArgumentException("La escuela no puede ser nula.\n");
+		}
 
-        Objects.requireNonNull(tipo);
-        Objects.requireNonNull(escuela);
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre del combatiente es obligatorio");
-        }
+		if (nombre == null || nombre.isBlank()) {
+			throw new IllegalArgumentException("El nombre del combatiente es obligatorio");
+		}
 
-        int id = siguienteId;
+		int id = siguienteId;
 
-        Combatiente combatiente;
+		Combatiente combatiente;
 
-        switch (tipo) {
-            case CULTIVADOR_ESPADA:
-                combatiente = new CultivadorDeLaEspada(id, nombre);
-                break;
+		switch (tipo) {
+		case CULTIVADOR_ESPADA:
+			combatiente = new CultivadorDeLaEspada(id, nombre);
+			break;
 
-            case MONJE_CELESTIAL:
-                combatiente = new MonjeDelCuerpoCelestial(id, nombre);
-                break;
+		case MONJE_CELESTIAL:
+			combatiente = new MonjeDelCuerpoCelestial(id, nombre);
+			break;
 
-            case HECHICERO_VACIO:
-                combatiente = new HechiceroDelVacio(id, nombre);
-                break;
+		case HECHICERO_VACIO:
+			combatiente = new HechiceroDelVacio(id, nombre);
+			break;
 
-            default:
-                throw new IllegalArgumentException("Tipo de combatiente desconocido");
-        }
+		default:
+			throw new IllegalArgumentException("Tipo de combatiente desconocido");
+		}
 
-        escuela.prepararCombatiente(combatiente);
+		escuela.prepararCombatiente(combatiente);
 
-        siguienteId++;
+		siguienteId++;
 
-        return combatiente;
-    }
+		return combatiente;
+	}
 }
-
-//Ejemplo implementacion:
-
-//FabricaCombatientes fabrica = new FabricaCombatientes();
-//Combatiente combatiente1 = fabrica.crearCombatiente(
-//TipoCombatiente.CULTIVADOR_ESPADA, "Li Jian", espadaCelestial);
-

@@ -71,7 +71,10 @@ public abstract class Combatiente {
 			throw new IllegalArgumentException("El daño base no puede ser negativo");
 		}
 		int danioConTipo = aplicarBonificacionDanioTipo(danioBase);
-		int bonoEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoDanio).sum();
+		int bonoEquipo = 0;
+		for (Equipamiento equipo : equipamientos.values()) {
+			bonoEquipo += equipo.bonoDanio();
+		}
 		return Math.max(0, danioConTipo + bonoEquipo);
 	}
 
@@ -80,11 +83,13 @@ public abstract class Combatiente {
 			throw new IllegalArgumentException("El daño recibido no puede ser negativo");
 		}
 		int danioTrasTipo = aplicarReduccionDanioTipo(danioBruto);
-		int reduccionEquipo = equipamientos.values().stream().mapToInt(Equipamiento::bonoReduccionDanio).sum();
+		int reduccionEquipo = 0;
+		for (Equipamiento equipo : equipamientos.values()) {
+			reduccionEquipo += equipo.bonoReduccionDanio();
+		}
 		// Acá también restamos reducción por técnicas defensivas activas en el combate
-		int danioFinal = Math.max(0, danioTrasTipo - reduccionEquipo - reduccionDefensivaActiva);// Se agrega
-																									// redDefensiva al
-																									// calculo.
+		int danioFinal = Math.max(0, danioTrasTipo - reduccionEquipo - reduccionDefensivaActiva);
+
 		this.vidaActual = Math.max(0, this.vidaActual - danioFinal);
 	}
 
@@ -117,6 +122,10 @@ public abstract class Combatiente {
 			this.vidaActual = Math.min(this.vidaActual, getVidaMaxima());
 			this.energiaActual = Math.min(this.energiaActual, getEnergiaMaxima());
 		}
+	}
+
+	public boolean tieneCategoriaOcupada(CategoriaEquipamiento categoria) {
+		return equipamientos.containsKey(categoria);
 	}
 
 	// Aumento de defensa durante x cantidad de turnos.
@@ -275,25 +284,27 @@ public abstract class Combatiente {
 		return Objects.hash(id);
 	}
 
-    // Notifica que cayó su compañero y devuelve si el combatiente activó una reacción.
-    public final boolean reaccionarAnteCaidaCompanero() {
-        return estaEnPie() && alCaerCompanero();
-    }
+	// Notifica que cayó su compañero y devuelve si el combatiente activó una
+	// reacción.
+	public final boolean reaccionarAnteCaidaCompanero() {
+		return estaEnPie() && alCaerCompanero();
+	}
 
-    // Las subclases reactivas definen su respuesta ante la caída del compañero.
-    protected boolean alCaerCompanero() {
-        return false;
-    }
+	// Las subclases reactivas definen su respuesta ante la caída del compañero.
+	protected boolean alCaerCompanero() {
+		return false;
+	}
 
-    // Permite limpiar estados reactivos temporales al iniciar otro combate.
-    protected void reiniciarReaccion() {
-    }
+	// Permite limpiar estados reactivos temporales al iniciar otro combate.
+	protected void reiniciarReaccion() {
+	}
 
-    // Recupera los valores máximos y elimina efectos temporales del combate anterior.
-    public void restaurar() {
-        vidaActual = getVidaMaxima();
-        energiaActual = getEnergiaMaxima();
-        reduccionDefensivaActiva = 0;
-        reiniciarReaccion();
-    }
+	// Recupera los valores máximos y elimina efectos temporales del combate
+	// anterior.
+	public void restaurar() {
+		vidaActual = getVidaMaxima();
+		energiaActual = getEnergiaMaxima();
+		reduccionDefensivaActiva = 0;
+		reiniciarReaccion();
+	}
 }

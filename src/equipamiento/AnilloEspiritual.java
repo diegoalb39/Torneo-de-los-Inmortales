@@ -4,7 +4,7 @@ public class AnilloEspiritual extends Equipamiento {
     private static final int BONO_ENERGIA = 20;
 
     // Inicializa el objeto con su nombre y categoría correspondiente.
-    public AnilloEspiritual() {
+	public AnilloEspiritual() {
         super("Anillo Espiritual", CategoriaEquipamiento.ANILLO);
     }
 
