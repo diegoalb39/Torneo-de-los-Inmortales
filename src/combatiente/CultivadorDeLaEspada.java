@@ -13,7 +13,9 @@ public class CultivadorDeLaEspada extends Combatiente {
  // Aplica el bono propio y consume la venganza si está activa.
     @Override
     protected int aplicarBonificacionDanioTipo(int danio) {
-        return danio + BONO_DANIO_ESPADA + bonoProximoAtaque;
+       int resultado = danio + BONO_DANIO_ESPADA + bonoProximoAtaque;
+       bonoProximoAtaque = 0;
+       return resultado;
     }
     
     // La caída del compañero potencia el siguiente ataque.

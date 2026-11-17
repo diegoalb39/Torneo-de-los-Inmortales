@@ -57,7 +57,6 @@ public class FabricaCombatientes {
 //Ejemplo implementacion:
 
 //FabricaCombatientes fabrica = new FabricaCombatientes();
-//
 //Combatiente combatiente1 = fabrica.crearCombatiente(
 //TipoCombatiente.CULTIVADOR_ESPADA, "Li Jian", espadaCelestial);
 
